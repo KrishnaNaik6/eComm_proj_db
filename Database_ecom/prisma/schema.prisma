@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  u_id Int @default(autoincrement()) @unique
+  name String
+  email String 
+  password String
+  cart Cart[]
+  wishlist Wishlist[]
+  order Order[]
+  payment Payment[]
+}
+
+model seller {
+  product Product @relation(references: [prod_id], fields: [product_id])
+  seller_id Int @default(autoincrement()) @unique
+  name String
+  email String
+  password String
+  ph_no String
+  business_name String
+  business_address String
+  product_id Int
+}
+
+model Product{
+  prod_id Int @default(autoincrement()) @unique
+  name String
+  price Float
+  brancd String
+  images String
+  stock Int
+  rating Float
+  seller seller[]
+  cart cartItem[]
+  order Order[]
+  whihslist WishlistItem[]
+}
+
+model Cart{
+  user User @relation(references: [u_id], fields: [user_id])
+  cart_id Int @default(autoincrement()) @unique
+  user_id Int 
+  c_item cartItem[]
+}
+
+model cartItem{
+  Product Product @relation(references: [prod_id], fields: [Product_id])
+  cart Cart @relation(references: [cart_id], fields: [cartid])
+  item_id Int @default(autoincrement()) @unique
+  Product_id Int
+  cartid Int
+}
+
+model Order{
+  Product Product @relation(references: [prod_id], fields: [prod_id])
+  user User @relation(references: [u_id], fields: [user_id])
+  Ord_id Int @default(autoincrement()) @unique
+  prod_id Int
+  user_id Int
+  payment Payment[]
+}
+
+model Payment{
+  order Order @relation(references: [Ord_id], fields: [order_id])
+  user User @relation(references: [u_id], fields: [user_id])
+  pay_id Int @default(autoincrement()) @unique
+  order_id Int
+  user_id Int
+}
+
+model Wishlist{
+  user User @relation(references: [u_id], fields: [user_id])
+  wish_id Int @default(autoincrement()) @unique
+  user_id Int
+  wish_item WishlistItem[]
+}
+
+model WishlistItem{
+  wishl_id Int @default(autoincrement()) @unique
+  wishlist Wishlist @relation(references: [wish_id], fields: [wish_id])
+  product Product @relation(references: [prod_id], fields: [product_id])
+  wish_id Int
+  user_id Int
+  product_id Int
+}
